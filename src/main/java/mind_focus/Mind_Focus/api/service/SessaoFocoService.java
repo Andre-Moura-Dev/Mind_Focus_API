@@ -1,7 +1,9 @@
 package mind_focus.Mind_Focus.api.service;
 
 import mind_focus.Mind_Focus.api.exceptions.DefaultExceptionHandler;
+import mind_focus.Mind_Focus.api.model.UsuarioEntity;
 import mind_focus.Mind_Focus.api.repository.SessaoFocoRepository;
+import mind_focus.Mind_Focus.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +20,16 @@ public class SessaoFocoService {
     @Autowired
     private SessaoFocoRepository sessaoFocoRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     public List<SessaoFocoDTO> listarTodos() throws DefaultExceptionHandler {
         try {
             return sessaoFocoRepository.findAll()
                     .stream()
                     .map(sessaoFoco -> SessaoFocoDTO.builder()
                             .idSessaoFoco(sessaoFoco.getIdSessaoFoco())
-                            .usuario(sessaoFoco.getUsuario())
+                            .idUsuario(sessaoFoco.getUsuario().getIdUsuario())
                             .duracaoMinutos(sessaoFoco.getDuracaoMinutos())
                             .humorApos(sessaoFoco.getHumorApos())
                             .dataSessao(sessaoFoco.getDataSessao())
@@ -48,20 +53,26 @@ public class SessaoFocoService {
             if (dto.getDuracaoMinutos() <= 0) {
                 throw new DefaultExceptionHandler(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Duração deve ser maior que zero."
+                        "Operação inválida! Duração deve ser maior que zero."
                 );
             }
 
             if (dto.getHumorApos() < 1 || dto.getHumorApos() > 5) {
                 throw new DefaultExceptionHandler(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Humor deve estar entre 1 e 5."
+                        "Operação inválida! Humor deve estar entre 1 e 5."
                 );
             }
 
+            UsuarioEntity usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new DefaultExceptionHandler(
+                            HttpStatus.NOT_FOUND.value(),
+                            "Operação inválida! Usuário não encontrado"
+                    ));
+
             SessaoFocoEntity sessaoFoco = new SessaoFocoEntity();
 
-            sessaoFoco.setUsuario(dto.getUsuario());
+            sessaoFoco.setUsuario(usuario);
             sessaoFoco.setDuracaoMinutos(dto.getDuracaoMinutos());
             sessaoFoco.setHumorApos(dto.getHumorApos());
             sessaoFoco.setDataSessao(dto.getDataSessao());
@@ -70,7 +81,7 @@ public class SessaoFocoService {
 
             return SessaoFocoDTO.builder()
                     .idSessaoFoco(sessaoFocoSalva.getIdSessaoFoco())
-                    .usuario(sessaoFocoSalva.getUsuario())
+                    .idUsuario(sessaoFocoSalva.getUsuario().getIdUsuario())
                     .duracaoMinutos(sessaoFocoSalva.getDuracaoMinutos())
                     .humorApos(sessaoFocoSalva.getHumorApos())
                     .dataSessao(sessaoFocoSalva.getDataSessao())
@@ -104,13 +115,19 @@ public class SessaoFocoService {
                 );
             }
 
+            UsuarioEntity usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new DefaultExceptionHandler(
+                            HttpStatus.NOT_FOUND.value(),
+                            "Operação inválida! Usuário não encontrado"
+                    ));
+
             SessaoFocoEntity sessaoFoco = sessaoFocoRepository.findById(id)
                     .orElseThrow(() -> new DefaultExceptionHandler(
                             HttpStatus.NOT_FOUND.value(),
                             "Operação Inválida! Sessão Foco não encontrado para atualização."
                     ));
 
-            sessaoFoco.setUsuario(dto.getUsuario());
+            sessaoFoco.setUsuario(usuario);
             sessaoFoco.setDuracaoMinutos(dto.getDuracaoMinutos());
             sessaoFoco.setHumorApos(dto.getHumorApos());
             sessaoFoco.setDataSessao(dto.getDataSessao());
@@ -120,7 +137,7 @@ public class SessaoFocoService {
 
             return SessaoFocoDTO.builder()
                     .idSessaoFoco(sessaoFocoAtualizada.getIdSessaoFoco())
-                    .usuario(sessaoFocoAtualizada.getUsuario())
+                    .idUsuario(sessaoFocoAtualizada.getUsuario().getIdUsuario())
                     .duracaoMinutos(sessaoFocoAtualizada.getDuracaoMinutos())
                     .humorApos(sessaoFocoAtualizada.getHumorApos())
                     .dataSessao(sessaoFocoAtualizada.getDataSessao())
@@ -176,11 +193,11 @@ public class SessaoFocoService {
 
     public List<SessaoFocoDTO> listarSessoesFocoPorUsuario(Long idUsuario) throws DefaultExceptionHandler {
         try {
-            return sessaoFocoRepository.findByUsuario(idUsuario)
+            return sessaoFocoRepository.findByUsuario_IdUsuario(idUsuario)
                     .stream()
                     .map(sessaoFoco -> SessaoFocoDTO.builder()
                             .idSessaoFoco(sessaoFoco.getIdSessaoFoco())
-                            .usuario(sessaoFoco.getUsuario())
+                            .idUsuario(sessaoFoco.getUsuario().getIdUsuario())
                             .duracaoMinutos(sessaoFoco.getDuracaoMinutos())
                             .humorApos(sessaoFoco.getHumorApos())
                             .dataSessao(sessaoFoco.getDataSessao())
@@ -201,7 +218,7 @@ public class SessaoFocoService {
                     .stream()
                     .map(sessaoFoco -> SessaoFocoDTO.builder()
                             .idSessaoFoco(sessaoFoco.getIdSessaoFoco())
-                            .usuario(sessaoFoco.getUsuario())
+                            .idUsuario(sessaoFoco.getUsuario().getIdUsuario())
                             .duracaoMinutos(sessaoFoco.getDuracaoMinutos())
                             .humorApos(sessaoFoco.getHumorApos())
                             .dataSessao(sessaoFoco.getDataSessao())

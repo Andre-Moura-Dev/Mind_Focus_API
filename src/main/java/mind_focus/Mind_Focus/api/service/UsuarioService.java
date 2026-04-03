@@ -45,7 +45,7 @@ public class UsuarioService {
     public UsuarioDTO cadastrarUsuario(UsuarioDTO dto) throws DefaultExceptionHandler {
         try {
 
-            // Validações De Campos
+            // Validações
             if (dto.getNome() == null || dto.getNome().isBlank()) {
                 throw new DefaultExceptionHandler(
                         HttpStatus.BAD_REQUEST.value(),
@@ -101,7 +101,7 @@ public class UsuarioService {
     public UsuarioDTO atualizarUsuario(Long id, UsuarioDTO dto) throws DefaultExceptionHandler {
         try {
 
-            // Validações De Campos
+            // Validações
             if (dto.getNome() == null || dto.getNome().isBlank()) {
                 throw new DefaultExceptionHandler(
                         HttpStatus.BAD_REQUEST.value(),
@@ -138,14 +138,6 @@ public class UsuarioService {
 
             usuario.setNome(dto.getNome());
             usuario.setEmail(dto.getEmail());
-
-            // Verifica se algum usuário já está usando o email
-            if (!usuario.getEmail().equals(dto.getEmail()) && usuarioRepository.existsByEmail(dto.getEmail())) {
-                throw new DefaultExceptionHandler(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Operação inválida! Este e-mail já está em uso."
-                );
-            }
 
             // Criptografa senha quando o usuário é atualizado
             if (dto.getSenha() != null && !dto.getSenha().isEmpty()) {
@@ -238,7 +230,6 @@ public class UsuarioService {
                     .idUsuario(usuario.getIdUsuario())
                     .nome(usuario.getNome())
                     .email(usuario.getEmail())
-
                     .build();
 
         } catch (Exception e) {

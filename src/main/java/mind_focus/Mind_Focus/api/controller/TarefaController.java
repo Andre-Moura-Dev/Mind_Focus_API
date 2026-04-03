@@ -1,5 +1,6 @@
 package mind_focus.Mind_Focus.api.controller;
 
+import mind_focus.Mind_Focus.api.enums.Prioridade;
 import mind_focus.Mind_Focus.api.exceptions.DefaultExceptionHandler;
 import mind_focus.Mind_Focus.api.dto.TarefaDTO;
 import mind_focus.Mind_Focus.api.model.TarefaEntity;
@@ -85,7 +86,7 @@ public class TarefaController {
     }
 
     @GetMapping(value = "/prioridade-tarefas/{prioridade}")
-    public ResponseEntity<List<TarefaDTO>> filtrarPorPrioridade(@PathVariable String prioridade) throws DefaultExceptionHandler {
+    public ResponseEntity<List<TarefaDTO>> filtrarPorPrioridade(@PathVariable Prioridade prioridade) throws DefaultExceptionHandler {
         List<TarefaDTO> tarefas = tarefaService.filtrarPorPrioridade(prioridade);
         return ResponseEntity.ok(tarefas);
     }
@@ -94,5 +95,11 @@ public class TarefaController {
     public ResponseEntity<List<TarefaDTO>> buscarPorData(@PathVariable java.time.LocalDate data) throws DefaultExceptionHandler {
         List<TarefaDTO> tarefas = tarefaService.buscarPorData(data);
         return ResponseEntity.ok(tarefas);
+    }
+
+    @GetMapping(value = "/contar-tarefas-usuario/{id}")
+    public ResponseEntity<Long> contarTarefasPorUsuario(@PathVariable Long id) throws DefaultExceptionHandler {
+        long totalTarefas = tarefaService.contarTarefasUsuario(id);
+        return ResponseEntity.ok(totalTarefas);
     }
 }

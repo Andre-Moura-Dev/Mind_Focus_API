@@ -1,7 +1,9 @@
 package mind_focus.Mind_Focus.api.service;
 
 import mind_focus.Mind_Focus.api.exceptions.DefaultExceptionHandler;
+import mind_focus.Mind_Focus.api.model.UsuarioEntity;
 import mind_focus.Mind_Focus.api.repository.DespejoCerebralRepository;
+import mind_focus.Mind_Focus.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +19,16 @@ public class DespejoCerebralService {
     @Autowired
     private DespejoCerebralRepository despejoCerebralRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     public List<DespejoCerebralDTO> listarTodos() throws DefaultExceptionHandler {
         try {
             return despejoCerebralRepository.findAll()
                     .stream()
                     .map(despejoCerebral -> DespejoCerebralDTO.builder()
                             .idDespejoCerebral(despejoCerebral.getIdDespejoCerebral())
-                            .usuario(despejoCerebral.getUsuario())
+                            .idUsuario(despejoCerebral.getUsuario().getIdUsuario())
                             .conteudo(despejoCerebral.getConteudo())
                             .build()
                     )
@@ -48,16 +53,22 @@ public class DespejoCerebralService {
                 );
             }
 
+            UsuarioEntity usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new DefaultExceptionHandler(
+                            HttpStatus.NOT_FOUND.value(),
+                            "Operação inválida! Usuário não encontrado"
+                    ));
+
             DespejoCerebralEntity despejoCerebral = new DespejoCerebralEntity();
 
-            despejoCerebral.setUsuario(dto.getUsuario());
+            despejoCerebral.setUsuario(usuario);
             despejoCerebral.setConteudo(dto.getConteudo());
 
             DespejoCerebralEntity despejoCerebralSalvo = despejoCerebralRepository.save(despejoCerebral);
 
             return DespejoCerebralDTO.builder()
                     .idDespejoCerebral(despejoCerebralSalvo.getIdDespejoCerebral())
-                    .usuario(despejoCerebralSalvo.getUsuario())
+                    .idUsuario(despejoCerebralSalvo.getUsuario().getIdUsuario())
                     .conteudo(despejoCerebralSalvo.getConteudo())
                     .build();
 
@@ -81,20 +92,26 @@ public class DespejoCerebralService {
                 );
             }
 
+            UsuarioEntity usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new DefaultExceptionHandler(
+                            HttpStatus.NOT_FOUND.value(),
+                            "Operação inválida! Usuário não encontrado"
+                    ));
+
             DespejoCerebralEntity despejoCerebral = despejoCerebralRepository.findById(id)
                     .orElseThrow(() -> new DefaultExceptionHandler(
                             HttpStatus.NOT_FOUND.value(),
                             "Operação Inválida! Despejo Cerebral não encontrado para atualziação."
                     ));
 
-            despejoCerebral.setUsuario(dto.getUsuario());
+            despejoCerebral.setUsuario(usuario);
             despejoCerebral.setConteudo(dto.getConteudo());
 
             DespejoCerebralEntity despejoCerebralAtualizado = despejoCerebralRepository.save(despejoCerebral);
 
             return DespejoCerebralDTO.builder()
                     .idDespejoCerebral(despejoCerebralAtualizado.getIdDespejoCerebral())
-                    .usuario(despejoCerebralAtualizado.getUsuario())
+                    .idUsuario(despejoCerebralAtualizado.getUsuario().getIdUsuario())
                     .conteudo(despejoCerebralAtualizado.getConteudo())
                     .build();
 
@@ -130,17 +147,11 @@ public class DespejoCerebralService {
 
     public DespejoCerebralEntity buscarPorId(Long id) throws DefaultExceptionHandler {
         try {
-            DespejoCerebralEntity despejoCerebral = despejoCerebralRepository.findById(id)
+            return despejoCerebralRepository.findById(id)
                     .orElseThrow(() -> new DefaultExceptionHandler(
                             HttpStatus.NOT_FOUND.value(),
                             "Operação Inválida! Despejo Cerebral não encontrado."
                     ));
-
-            return DespejoCerebralEntity.builder()
-                    .idDespejoCerebral(despejoCerebral.getIdDespejoCerebral())
-                    .usuario(despejoCerebral.getUsuario())
-                    .conteudo(despejoCerebral.getConteudo())
-                    .build();
 
         } catch (Exception e) {
             if (e instanceof DefaultExceptionHandler) {

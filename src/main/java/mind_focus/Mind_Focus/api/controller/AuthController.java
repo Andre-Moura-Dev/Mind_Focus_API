@@ -5,7 +5,6 @@ import mind_focus.Mind_Focus.api.dto.LoginResponseDTO;
 import mind_focus.Mind_Focus.api.model.UsuarioEntity;
 import mind_focus.Mind_Focus.api.repository.UsuarioRepository;
 import mind_focus.Mind_Focus.api.security.JwtService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;

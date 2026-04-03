@@ -1,5 +1,6 @@
 package mind_focus.Mind_Focus.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "Sessao_Foco")
+@Table(name = "Sessoes_Foco")
 public class SessaoFocoEntity {
 
     @Id
@@ -36,6 +37,7 @@ public class SessaoFocoEntity {
     @Column(name = "data_sessao", nullable = false)
     private LocalDate dataSessao;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "criada_em", nullable = false)
     private LocalDateTime criadaEm;
 

@@ -3,7 +3,6 @@ package mind_focus.Mind_Focus.api.model;
 import lombok.*;
 import jakarta.persistence.*;
 import mind_focus.Mind_Focus.api.enums.Prioridade;
-
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 

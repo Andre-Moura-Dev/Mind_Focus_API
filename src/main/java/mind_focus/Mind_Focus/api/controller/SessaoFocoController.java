@@ -55,7 +55,7 @@ public class SessaoFocoController {
         return ResponseEntity.ok(sessaoFoco);
     }
 
-    @GetMapping(value = "/sessoes-foco-usuario/{id}")
+    @GetMapping(value = "/sessoes-foco-usuario/{idUsuario}")
     public ResponseEntity<List<SessaoFocoDTO>> listarSessaoFocoUsuario(@PathVariable Long idUsuario) throws DefaultExceptionHandler {
         List<SessaoFocoDTO> listaSessoesFoco = sessaoFocoService.listarSessoesFocoPorUsuario(idUsuario);
         return ResponseEntity.ok(listaSessoesFoco);
@@ -68,7 +68,7 @@ public class SessaoFocoController {
         return ResponseEntity.ok(listaDataSessoes);
     }
 
-    @GetMapping(value = "/total-minutos-usuario/{id}")
+    @GetMapping(value = "/total-minutos-usuario/{idUsuario}")
     public ResponseEntity<Integer> totalMinutosFoco(@PathVariable Long idUsuario) throws DefaultExceptionHandler {
         Integer totalMinutos = sessaoFocoService.totalMinutosFoco(idUsuario);
         return ResponseEntity.ok(totalMinutos != null ? totalMinutos : 0);

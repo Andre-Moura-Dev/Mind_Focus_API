@@ -1,5 +1,6 @@
 package mind_focus.Mind_Focus.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "Despejo_Cerebral")
+@Table(name = "Despejos_Cerebrais")
 public class DespejoCerebralEntity {
 
     @Id
@@ -29,6 +30,7 @@ public class DespejoCerebralEntity {
     @Column(name = "conteudo", nullable = false, columnDefinition = "TEXT")
     private String conteudo;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
 

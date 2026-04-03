@@ -1,5 +1,6 @@
 package mind_focus.Mind_Focus.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -21,12 +22,14 @@ public class UsuarioEntity {
     @Column(name = "nome", nullable = false, length = 50)
     private String nome;
 
-    @Column(name = "email", nullable = false, unique = true, length = 100)
+    @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "senha", nullable = false, length = 255)
     private String senha;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
 

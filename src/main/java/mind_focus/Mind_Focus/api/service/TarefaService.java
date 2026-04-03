@@ -1,7 +1,10 @@
 package mind_focus.Mind_Focus.api.service;
 
+import mind_focus.Mind_Focus.api.enums.Prioridade;
 import mind_focus.Mind_Focus.api.exceptions.DefaultExceptionHandler;
+import mind_focus.Mind_Focus.api.model.UsuarioEntity;
 import mind_focus.Mind_Focus.api.repository.TarefaRepository;
+import mind_focus.Mind_Focus.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +21,16 @@ public class TarefaService {
     @Autowired
     private TarefaRepository tarefaRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     public List<TarefaDTO> listarTodos() throws DefaultExceptionHandler {
         try {
             return tarefaRepository.findAll()
                     .stream()
                     .map(tarefa -> TarefaDTO.builder()
                             .idTarefa(tarefa.getIdTarefa())
-                            .usuario(tarefa.getUsuario())
+                            .idUsuario(tarefa.getUsuario().getIdUsuario())
                             .titulo(tarefa.getTitulo())
                             .descricao(tarefa.getDescricao())
                             .prioridade(tarefa.getPrioridade())
@@ -62,9 +68,16 @@ public class TarefaService {
                 );
             }
 
+            UsuarioEntity usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new DefaultExceptionHandler(
+                            HttpStatus.NOT_FOUND.value(),
+                            "Operação inválida! Usuário não encontrado"
+                    ));
+
             TarefaEntity tarefa = new TarefaEntity();
 
-            tarefa.setUsuario(dto.getUsuario());
+
+            tarefa.setUsuario(usuario);
             tarefa.setTitulo(dto.getTitulo());
             tarefa.setDescricao(dto.getDescricao());
             tarefa.setPrioridade(dto.getPrioridade());
@@ -76,7 +89,7 @@ public class TarefaService {
 
             return TarefaDTO.builder()
                     .idTarefa(tarefaSalva.getIdTarefa())
-                    .usuario(tarefaSalva.getUsuario())
+                    .idUsuario(tarefaSalva.getUsuario().getIdUsuario())
                     .titulo(tarefaSalva.getTitulo())
                     .descricao(tarefaSalva.getDescricao())
                     .prioridade(tarefaSalva.getPrioridade())
@@ -129,7 +142,7 @@ public class TarefaService {
 
             return TarefaDTO.builder()
                     .idTarefa(tarefaAtualizada.getIdTarefa())
-                    .usuario(tarefaAtualizada.getUsuario())
+                    .idUsuario(tarefaAtualizada.getUsuario().getIdUsuario())
                     .titulo(tarefaAtualizada.getTitulo())
                     .descricao(tarefaAtualizada.getDescricao())
                     .prioridade(tarefaAtualizada.getPrioridade())
@@ -187,11 +200,11 @@ public class TarefaService {
 
     public List<TarefaDTO> listarTarefasPorUsuario(Long idUsuario) throws DefaultExceptionHandler {
         try {
-            return tarefaRepository.findByUsuario(idUsuario)
+            return tarefaRepository.findByUsuario_IdUsuario(idUsuario)
                     .stream()
                     .map(tarefa -> TarefaDTO.builder()
                             .idTarefa(tarefa.getIdTarefa())
-                            .usuario(tarefa.getUsuario())
+                            .idUsuario(tarefa.getUsuario().getIdUsuario())
                             .titulo(tarefa.getTitulo())
                             .descricao(tarefa.getDescricao())
                             .prioridade(tarefa.getPrioridade())
@@ -227,7 +240,7 @@ public class TarefaService {
 
             return TarefaDTO.builder()
                     .idTarefa(tarefaAtualizada.getIdTarefa())
-                    .usuario(tarefaAtualizada.getUsuario())
+                    .idUsuario(tarefaAtualizada.getUsuario().getIdUsuario())
                     .titulo(tarefaAtualizada.getTitulo())
                     .descricao(tarefaAtualizada.getDescricao())
                     .prioridade(tarefaAtualizada.getPrioridade())
@@ -262,7 +275,7 @@ public class TarefaService {
 
             return TarefaDTO.builder()
                     .idTarefa(tarefaAtualizada.getIdTarefa())
-                    .usuario(tarefaAtualizada.getUsuario())
+                    .idUsuario(tarefaAtualizada.getUsuario().getIdUsuario())
                     .titulo(tarefaAtualizada.getTitulo())
                     .descricao(tarefaAtualizada.getDescricao())
                     .prioridade(tarefaAtualizada.getPrioridade())
@@ -286,7 +299,7 @@ public class TarefaService {
                     .stream()
                     .map(tarefa -> TarefaDTO.builder()
                             .idTarefa(tarefa.getIdTarefa())
-                            .usuario(tarefa.getUsuario())
+                            .idUsuario(tarefa.getUsuario().getIdUsuario())
                             .titulo(tarefa.getTitulo())
                             .descricao(tarefa.getDescricao())
                             .prioridade(tarefa.getPrioridade())
@@ -307,14 +320,11 @@ public class TarefaService {
 
     public List<TarefaDTO> listarAtrasadas() throws DefaultExceptionHandler {
         try {
-            return tarefaRepository.findByDataTarefaBeforeAndCompletada(
-                            java.time.LocalDate.now(),
-                            false
-                    )
+            return tarefaRepository.findByDataTarefaBeforeAndCompletada(LocalDate.now(), false)
                     .stream()
                     .map(tarefa -> TarefaDTO.builder()
                             .idTarefa(tarefa.getIdTarefa())
-                            .usuario(tarefa.getUsuario())
+                            .idUsuario(tarefa.getUsuario().getIdUsuario())
                             .titulo(tarefa.getTitulo())
                             .descricao(tarefa.getDescricao())
                             .prioridade(tarefa.getPrioridade())
@@ -333,13 +343,13 @@ public class TarefaService {
         }
     }
 
-    public List<TarefaDTO> filtrarPorPrioridade(String prioridade) throws DefaultExceptionHandler {
+    public List<TarefaDTO> filtrarPorPrioridade(Prioridade prioridade) throws DefaultExceptionHandler {
         try {
             return tarefaRepository.findByPrioridade(prioridade)
                     .stream()
                     .map(tarefa -> TarefaDTO.builder()
                             .idTarefa(tarefa.getIdTarefa())
-                            .usuario(tarefa.getUsuario())
+                            .idUsuario(tarefa.getUsuario().getIdUsuario())
                             .titulo(tarefa.getTitulo())
                             .descricao(tarefa.getDescricao())
                             .prioridade(tarefa.getPrioridade())
@@ -364,7 +374,7 @@ public class TarefaService {
                     .stream()
                     .map(tarefa -> TarefaDTO.builder()
                             .idTarefa(tarefa.getIdTarefa())
-                            .usuario(tarefa.getUsuario())
+                            .idUsuario(tarefa.getUsuario().getIdUsuario())
                             .titulo(tarefa.getTitulo())
                             .descricao(tarefa.getDescricao())
                             .prioridade(tarefa.getPrioridade())
@@ -374,6 +384,18 @@ public class TarefaService {
                             .build()
                     )
                     .toList();
+        } catch (Exception e) {
+            if (e instanceof DefaultExceptionHandler) {
+                throw e;
+            } else {
+                throw new DefaultExceptionHandler(e);
+            }
+        }
+    }
+
+    public long contarTarefasUsuario(Long idUsuario) throws DefaultExceptionHandler {
+        try {
+            return tarefaRepository.countByUsuario_IdUsuario(idUsuario);
         } catch (Exception e) {
             if (e instanceof DefaultExceptionHandler) {
                 throw e;

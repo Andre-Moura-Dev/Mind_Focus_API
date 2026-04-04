@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -92,7 +93,7 @@ public class TarefaController {
     }
 
     @GetMapping(value = "/data-tarefas/{data}")
-    public ResponseEntity<List<TarefaDTO>> buscarPorData(@PathVariable java.time.LocalDate data) throws DefaultExceptionHandler {
+    public ResponseEntity<List<TarefaDTO>> buscarPorData(@PathVariable LocalDate data) throws DefaultExceptionHandler {
         List<TarefaDTO> tarefas = tarefaService.buscarPorData(data);
         return ResponseEntity.ok(tarefas);
     }

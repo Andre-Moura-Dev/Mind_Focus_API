@@ -11,9 +11,12 @@ import mind_focus.Mind_Focus.api.model.UsuarioEntity;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class UsuarioService {
+
+    private final static String regexEmail = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -67,6 +70,22 @@ public class UsuarioService {
                 );
             }
 
+            // Verificação de e-mail inválido
+            if (dto.getEmail() == null || !Pattern.matches(regexEmail, dto.getEmail())) {
+                throw new DefaultExceptionHandler(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "E-mail inválido! Por favor, informe um formato correto."
+                );
+            }
+
+            // Validação de caracteres senha
+            if (dto.getSenha() == null || dto.getSenha().length() < 8) {
+                throw new DefaultExceptionHandler(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Operação Inválida! Senha deve ter 8 caracteres."
+                );
+            }
+
             if (usuarioRepository.existsByEmail(dto.getEmail())) {
                 throw new DefaultExceptionHandler(
                         HttpStatus.BAD_REQUEST.value(),
@@ -116,10 +135,19 @@ public class UsuarioService {
                 );
             }
 
-            if (dto.getSenha() == null || dto.getSenha().isBlank()) {
+            // Verificação de e-mail inválido
+            if (dto.getEmail() == null || !Pattern.matches(regexEmail, dto.getEmail())) {
                 throw new DefaultExceptionHandler(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Operação inválida! Campo senha é obrigatório."
+                        "E-mail inválido! Por favor, informe um formato correto."
+                );
+            }
+
+            // Validação de caracteres senha
+            if (dto.getSenha() == null || dto.getSenha().length() < 8) {
+                throw new DefaultExceptionHandler(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "A senha deve ter no mínimo 8 caracteres."
                 );
             }
 

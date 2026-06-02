@@ -120,55 +120,66 @@ public class UsuarioService {
     public UsuarioDTO atualizarUsuario(Long id, UsuarioDTO dto) throws DefaultExceptionHandler {
         try {
 
-            // Validações
-            if (dto.getNome() == null || dto.getNome().isBlank()) {
-                throw new DefaultExceptionHandler(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Operação inválida! Campo nome é obrigatório."
-                );
-            }
-
-            if (dto.getEmail() == null || dto.getEmail().isBlank()) {
-                throw new DefaultExceptionHandler(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Operação inválida! Campo email é obrigatório."
-                );
-            }
-
-            // Verificação de e-mail inválido
-            if (dto.getEmail() == null || !Pattern.matches(regexEmail, dto.getEmail())) {
-                throw new DefaultExceptionHandler(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "E-mail inválido! Por favor, informe um formato correto."
-                );
-            }
-
-            // Validação de caracteres senha
-            if (dto.getSenha() == null || dto.getSenha().length() < 8) {
-                throw new DefaultExceptionHandler(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "A senha deve ter no mínimo 8 caracteres."
-                );
-            }
-
-            if (usuarioRepository.existsByEmail(dto.getEmail())) {
-                throw new DefaultExceptionHandler(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Operação Inválida! Já existe um Usuário com este email."
-                );
-            }
-
             UsuarioEntity usuario = usuarioRepository.findById(id)
                     .orElseThrow(() -> new DefaultExceptionHandler(
                             HttpStatus.NOT_FOUND.value(),
                             "Operação Inválida! Usuário não encontrado para atualização."
                     ));
 
-            usuario.setNome(dto.getNome());
-            usuario.setEmail(dto.getEmail());
+            if (dto.getNome() != null) {
 
-            // Criptografa senha quando o usuário é atualizado
-            if (dto.getSenha() != null && !dto.getSenha().isEmpty()) {
+                if (dto.getNome().isBlank()) {
+                    throw new DefaultExceptionHandler(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Operação Inválida! Campo nome é obrigatório."
+                    );
+                }
+
+                usuario.setNome(dto.getNome());
+            }
+
+            if (dto.getEmail() != null) {
+
+                if (dto.getEmail().isBlank()) {
+                    throw new DefaultExceptionHandler(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Operação Inválida! Campo e-mail obrigatório."
+                    );
+                }
+
+                if (!Pattern.matches(regexEmail, dto.getEmail())) {
+                    throw new DefaultExceptionHandler(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Operção Inválida! Por favor, informe um formato correto de e-mail"
+                    );
+                }
+
+                if (usuarioRepository.existsByEmailAndIdUsuarioNot(dto.getEmail(), id)) {
+                    throw new DefaultExceptionHandler(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Operção Inválida! Já existe um Usuário com este e-mail."
+                    );
+                }
+
+                usuario.setEmail(dto.getEmail());
+            }
+
+            if (dto.getSenha() != null) {
+
+                if (dto.getSenha().isBlank()) {
+                    throw new DefaultExceptionHandler(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Operação Inválida! Campo senha é obrigatório."
+                    );
+                }
+
+                if (dto.getSenha().length() < 8) {
+                    throw new DefaultExceptionHandler(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Operação Inválida! A senha deve ter no mínimo 8 caracteres."
+                    );
+                }
+
                 usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
             }
 
